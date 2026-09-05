@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kalman-pairs-trading"
+version = "0.1.0"
+description = "Paper-first Kalman-filter cointegration pairs trading strategy"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+dependencies = [
+  "numpy>=1.24,<3",
+  "pandas>=2.0,<3",
+  "statsmodels>=0.14,<1",
+]
+
+[project.optional-dependencies]
+alpaca = ["alpaca-py>=0.42,<1"]
+dev = ["pytest>=8,<9", "ruff>=0.8,<1"]
+
+[project.scripts]
+pairs-trader = "pairs_trading.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+
