@@ -73,6 +73,6 @@ config/default.json Default risk and signal parameters
 
 ## Reference
 
-Jia Yu, “Cointegration Approach for the Pair Trading Based on the Kalman Filter,” 2023, DOI: [10.2991/978-94-6463-102-9_66](https://doi.org/10.2991/978-94-6463-102-9_66).
+Yu, J. (2023). "Cointegration Approach for the Pair Trading Based on the Kalman Filter." In V. Escudero et al. (Eds.), *Proceedings of the 2022 2nd International Conference on Business Administration and Data Science (BADS 2022)*, Atlantis Highlights in Computer Sciences, Vol. 11, pp. 633-642. Atlantis Press. [https://doi.org/10.2991/978-94-6463-102-9_66](https://doi.org/10.2991/978-94-6463-102-9_66)
 
-This implementation is not a reproduction of the paper's source code. Where the paper is ambiguous, the project uses conservative, testable engineering definitions.
+The paper is available under the [Creative Commons Attribution-NonCommercial 4.0 International License](https://creativecommons.org/licenses/by-nc/4.0/). This project is an independent software implementation and is not affiliated with the paper's author or publisher. It is not a reproduction of the paper's source code; where the paper is ambiguous, the project uses conservative, testable engineering definitions.
