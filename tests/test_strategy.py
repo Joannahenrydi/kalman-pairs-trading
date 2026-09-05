@@ -43,7 +43,8 @@ class StrategyTests(unittest.TestCase):
                 self.symbol, self.qty = symbol, qty
 
         class Trading:
-            positions = [Position("X", "-10"), Position("Y", "7")]
+            def __init__(self):
+                self.positions = [Position("X", "-10"), Position("Y", "7")]
 
             def get_all_positions(self):
                 return self.positions

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -62,8 +65,8 @@ class AlpacaPaperBroker:
             for item in submitted:
                 try:
                     self.trading.cancel_order_by_id(item.id)
-                except Exception:
-                    pass
+                except Exception as cancel_error:  # noqa: BLE001
+                    logger.warning("failed to cancel order %s: %s", item.id, cancel_error)
             raise
 
     def pair_position(self, x: str, y: str) -> int:
