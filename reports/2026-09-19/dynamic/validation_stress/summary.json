@@ -1,0 +1,14 @@
+{
+  "return": 0.0030459432078169257,
+  "final_equity": 100304.59432078169,
+  "drawdown": -0.0006645579557410519,
+  "sharpe": 0.7511447670137288,
+  "entries": 3,
+  "rebalances": 0,
+  "commission": 25.00000082210541,
+  "slippage": 13.188108113861084,
+  "borrow": 20.308022476614333,
+  "dividends_net": 0.0,
+  "stopped": false,
+  "max_gross": 6847.480010986328
+}

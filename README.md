@@ -4,7 +4,53 @@ A GitHub-ready research and paper-trading project for U.S. equity pairs. The str
 
 > For research purposes only. This project is not financial advice. It sends no orders by default. The Alpaca integration is restricted to `paper=True`; observe paper performance, execution quality, and short-borrow constraints for an extended period before considering any further use.
 
-## Real-Data Research Update — September 19, 2026
+## Latest: Dynamic Signals and Hedge Allocation
+
+The dynamic research version updates a linear forecast monthly, evaluates cost-aware entry
+thresholds daily, and computes a constrained minimum-variance dollar hedge. It fixes share
+quantities at the signal close for next-close execution and charges for rebalancing.
+
+**Continuous 2020–September 18, 2026 comparison, after modeled costs:**
+
+| Version | Account return | Maximum drawdown | Entries | Mean gross exposure |
+|---|---:|---:|---:|---:|
+| Previous candidate, 20% entry allocation | −0.990% | 2.402% | 75 | $7,790 |
+| Previous candidate, 5% entry allocation | −0.410% | 0.747% | 75 | $1,943 |
+| Dynamic candidate, 20% entry cap | +0.010% | 0.212% | 18 | $510 |
+
+The approximately $9.74 profit on $100,000 is economically negligible. Much of the lower
+drawdown comes from trading less and holding less exposure. The dynamic candidate has
+**zero 2026 entries**, failed the training/validation acceptance criteria, and retains a
+**zero supported allocation**. All periods have been observed during research; none is
+claimed to be a new untouched test for this version.
+
+As of September 18, the conditional risk-minimizing gross-dollar split is **41.48% EWA /
+58.52% EWC**, or approximately **1.4844 EWA shares per EWC share**, with opposite signs.
+This is a notional allocation, not a margin requirement. The current signal is below the
+cost threshold, so the diagnostic desired position is zero.
+
+![Dynamic performance comparison](reports/2026-09-19/dynamic/performance.png)
+
+- [Dynamic report and methodology](reports/2026-09-19/dynamic/REPORT.md)
+- [Performance images and data index](reports/2026-09-19/dynamic/README.md)
+- [Download backtest data and images](reports/2026-09-19/dynamic/backtest_bundle.zip)
+- [Daily dynamic signals and hedge ratios](reports/2026-09-19/dynamic/dynamic_signals.csv)
+
+```bash
+pip install -e '.[data,charts,dev]'
+pairs-trader download --symbols EWA EWC --start 2015-01-01 --end 2026-09-19 --output output/optimization/market_data
+# The prior frozen candidate is recorded in the dated report snapshot.
+mkdir -p output/optimization
+cp reports/2026-09-19/frozen_selection.json output/optimization/frozen_selection.json
+python scripts/evaluate_dynamic.py
+```
+
+This writes figures, signals, fits, trades and a ZIP bundle to `output/dynamic/`.
+The 72-configuration search is exploratory: 48 general ridge candidates were followed by
+24 symmetric Kalman-z reversion candidates. Both research rounds are documented in the snapshot.
+The updated model remains separate from paper-order submission.
+
+## Previous Real-Data Research Update — September 19, 2026
 
 The updated EWA/EWC candidate made **+0.59% after modeled costs in January–September 18, 2026**
 (**+0.45% with doubled costs**, six round trips). This is a positive historical test period,

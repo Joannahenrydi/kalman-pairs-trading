@@ -1,5 +1,17 @@
 # EWA/EWC Research Snapshot — 2026-09-19
 
+## Latest Dynamic Version
+
+The [dynamic supplement](dynamic/README.md) adds daily cost-aware signals, monthly linear
+model updates, risk-minimizing hedge weights, performance figures and a downloadable data bundle.
+Its continuous 2020–2026 diagnostic return is +0.010%, with 0.212% maximum drawdown and
+only $510 average gross exposure. It still fails the acceptance rules and supports zero allocation.
+The earlier 2026 +0.59% result below belongs to the **previous candidate**, not the new dynamic one.
+
+![Dynamic performance](dynamic/performance.png)
+
+## Preserved Previous Snapshot
+
 This snapshot records a cost-aware strategy search and its historical evaluation.
 The 2026 candidate earned approximately 0.59% after modeled costs, but failed the
 earlier validation/audit requirements. **The selected allocation remains zero.**
