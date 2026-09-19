@@ -1,72 +1,51 @@
-# EWA/EWC Research Snapshot — 2026-09-19
+# Current Backtest: Dynamic Signals and Hedge Allocation
 
-## Latest Dynamic Version
+This directory contains only the current dynamic strategy's research results.
+The continuous January 2020–September 18, 2026 diagnostic run returned **+0.010%**
+with **0.212% maximum drawdown**, 18 entries and approximately **$510 average gross
+exposure** on $100,000. It failed the acceptance tests and made **no trades in 2026**.
+The supported allocation remains zero.
 
-The [dynamic supplement](dynamic/README.md) adds daily cost-aware signals, monthly linear
-model updates, risk-minimizing hedge weights, performance figures and a downloadable data bundle.
-Its continuous 2020–2026 diagnostic return is +0.010%, with 0.212% maximum drawdown and
-only $510 average gross exposure. It still fails the acceptance rules and supports zero allocation.
-The earlier 2026 +0.59% result below belongs to the **previous candidate**, not the new dynamic one.
+![Performance, drawdown, signals and hedge allocation](performance.png)
 
-![Dynamic performance](dynamic/performance.png)
+![Validation, sizing and annual performance](validation_and_sizing.png)
 
-## Preserved Previous Snapshot
+Both performance curves use this version. Doubled costs rerun the entry filters,
+so trade counts can change; the report also shows doubled costs on identical orders.
+All historical periods have been observed during research. No fresh untouched test
+or stable trading edge is claimed.
 
-This snapshot records a cost-aware strategy search and its historical evaluation.
-The 2026 candidate earned approximately 0.59% after modeled costs, but failed the
-earlier validation/audit requirements. **The selected allocation remains zero.**
-These are simulated historical trades, not broker fills or forward paper-trading results.
+## Files
 
-## Contents
+- [Full report (Chinese)](REPORT.md)
+- [Download images and backtest data](backtest_bundle.zip)
+- [Machine-readable evaluation](evaluation.json)
+- [Research protocol](protocol.json)
+- [Daily forecasts and hedge weights](dynamic_signals.csv)
+- [Monthly model fits and label-maturity dates](monthly_model_fits.csv)
+- [72-configuration search](training_search.csv)
+- [Validation candidates](validation_candidates.csv)
+- [Sizing analysis](sizing.csv)
+- [Continuous equity](continuous_dynamic/equity.csv)
+- [Continuous order events](continuous_dynamic/trades.csv)
+- [Source and input hashes](provenance.json)
+- [Provider metadata](data_metadata.json)
+- SVG: [performance](performance.svg), [validation and sizing](validation_and_sizing.svg)
 
-- [Full report (Chinese)](REPORT.md): results, assumptions, sizing and limitations.
-- [Evaluation JSON](evaluation.json): all metrics and the allocation decision.
-- [Protocol](protocol.json): dates, parameter count, cost assumptions and acceptance criteria.
-- [Frozen selection](frozen_selection.json): parameters chosen before downloading 2026 data.
-- [Training search](training_search.csv): every one of the 384 configurations.
-- [Validation candidates](validation_candidates.csv): the 12 training finalists.
-- [Sizing](sizing.csv): all eight gross-allocation levels, including cash.
-- Each stage directory contains `equity.csv`, `trades.csv` and `summary.json`.
-- `fresh_holdout_base/` and `fresh_holdout_stress/` contain the six 2026 round trips.
-- `comparison_*` contains the old-threshold/new-candidate comparison under identical accounting.
-- `original_baseline_*` preserves the first, simpler adjusted-price backtest.
-- [Provenance](provenance.json): runtime versions and SHA256 hashes of source, results and raw inputs.
-- [Data metadata](data_metadata.json): provider, retrieval time and downloaded coverage.
+Each scenario directory contains `equity.csv`, `trades.csv` and `summary.json`.
+The equal-dollar ablation changes only this version's hedge construction and retrains
+its forecast with unchanged hyperparameters; it is not an earlier strategy version.
 
-The loader metadata describes the downloader's adjusted-price CSV. The upgraded
-research engine instead reads raw `Close`, `Dividends`, `Capital Gains` and
-`Stock Splits` fields from the two source files. It builds a forward total-return
-index for signals and separately books dividends against actual-price holdings.
+## Units and Reproduction
 
-## Reproduction
+`equity`, `gross`, `net`, `commission` and `slippage` are USD. `qx` and `qy` are
+signed EWA/EWC shares; negative means short. `prediction` and `entry_threshold`
+are horizon returns per gross dollar. `weight_x` and `weight_y` divide gross
+notional dollars, not broker margin or cash requirements. `signal_date` fixes
+share quantities; `date` is the simulated fill date. Zero-trade files retain headers.
 
-Run from the repository root:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e '.[data,dev]'
-pairs-trader download --symbols EWA EWC --start 2015-01-01 --end 2026-01-01 --output output/real_api/market_data
-python scripts/evaluate_real_data.py
-python scripts/optimize_pairs.py select
-pairs-trader download --symbols EWA EWC --start 2015-01-01 --end 2026-09-19 --output output/optimization/market_data
-python scripts/optimize_pairs.py evaluate
-ruff check src tests scripts
-pytest
-```
-
-The scripts write new runs to `output/`, leaving this dated snapshot unchanged.
-Yahoo may revise historical data, so reruns need not be bit-identical. Compare input
-hashes and package versions before comparing results. Raw market-data files and
-download caches are not distributed in this snapshot; fetch them from the provider.
-
-For the original run, parameter selection preceded the 2026 download. The 2020–2025
-baseline had already been inspected, and is not represented as untouched data.
-Repeating the commands now does not create a new unseen test. Each period starts
-with $100,000, no open position, and ends with costed liquidation. The 20% candidate
-allocation shown in the report is diagnostic; it does not override the zero-allocation decision.
-
-The candidate has not been connected to the Alpaca paper-order command. Actual
-borrow availability/rates, asynchronous fills, market impact and market factor
-neutrality still require validation. The 5% drawdown limit is a historical selection
-constraint, not a promise about future losses.
+Use the main README commands to fetch data, install the chart dependencies and run
+`python scripts/evaluate_dynamic.py`. New local runs are written to `output/dynamic/`.
+Current data revisions may prevent bit-for-bit reproduction; compare provider
+input hashes and package versions. No raw market-data downloads or cache databases
+are distributed, and the research script submits no paper orders.

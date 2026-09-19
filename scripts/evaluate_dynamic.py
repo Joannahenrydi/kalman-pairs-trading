@@ -15,7 +15,7 @@ from pairs_trading.dynamic import (
     dynamic_signals,
     simulate_dynamic,
 )
-from pairs_trading.research import Costs, Parameters, load_market, research_signals, simulate
+from pairs_trading.research import Costs, load_market
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "output/dynamic"
@@ -37,7 +37,7 @@ def save_result(name, result):
     trades.to_csv(directory / "trades.csv", index=False)
 
 
-def make_charts(market, signals, dynamic, static, evaluation, sizes):
+def make_charts(market, signals, dynamic, stressed, evaluation, sizes):
     os.environ.setdefault("MPLCONFIGDIR", str(OUT / ".mpl-cache"))
     import matplotlib
     matplotlib.use("Agg")
@@ -53,7 +53,7 @@ def make_charts(market, signals, dynamic, static, evaluation, sizes):
     fig, axes = plt.subplots(2, 2, figsize=(15, 10))
     fig.suptitle("EWA / EWC · Dynamic strategy research", x=.07, ha="left", fontsize=21, fontweight="bold")
     fig.text(.07, .924, "$100,000 account · 20% maximum entry gross exposure · fees, slippage and borrow included", color="#526078")
-    for label, result, color in (("Previous candidate", static, blue), ("Dynamic candidate", dynamic, teal)):
+    for label, result, color in (("Dynamic · doubled costs", stressed, blue), ("Dynamic · base costs", dynamic, teal)):
         curve = result[1]
         axes[0, 0].plot(curve.index, curve.equity/100000-1, label=label, color=color, lw=1.7)
         axes[0, 1].plot(curve.index, curve.equity/curve.equity.cummax()-1, label=label, color=color, lw=1.5)
@@ -85,7 +85,7 @@ def make_charts(market, signals, dynamic, static, evaluation, sizes):
         ax.xaxis.set_major_locator(mdates.MonthLocator(interval=4))
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
         ax.grid(axis="y")
-    fig.text(.07, .026, "Retrospective research: all periods were previously observed. Both curves start flat in 2020; no stitched account resets.", fontsize=10, color="#526078")
+    fig.text(.07, .026, "Retrospective research; no account resets. Both curves use this version. Doubled costs rerun filters and change trade counts.", fontsize=10, color="#526078")
     fig.subplots_adjust(left=.07, right=.97, bottom=.09, top=.86, wspace=.25, hspace=.37)
     for suffix in ("png", "svg"):
         fig.savefig(OUT / f"performance.{suffix}", dpi=180)
@@ -140,7 +140,7 @@ def main():
                 "selection": "Top 12 training Sharpe candidates with >=8 entries; select highest min(train,validation) Sharpe among positive train/validation and positive doubled-cost validation, otherwise diagnostic best with zero allocation.",
                 "allocation": "0/5/10/20/35/50/75/100% gross cap; maximize validation return if train,validation and stressed validation positive with <=5% historical drawdown; subsequent audit must also pass.",
                 "warning": "All dates including 2026 were observed before this research; no untouched test claim.",
-                "research_history": "Initial 48 ridge configurations produced weak aggregate improvement and failed validation. Added 24 Kalman-z symmetric reversion configurations; initial results retained in output/dynamic_ridge_round1. This is iterative exploratory research.",
+                "research_history": "Initial 48 ridge configurations produced weak aggregate improvement and failed validation. Added 24 Kalman-z symmetric reversion configurations. This is iterative exploratory research.",
                 "execution": "Prior-close integer share quantities; next-close fills; monthly ridge trained only on matured next-close-entry horizon labels."}
     (OUT / "protocol.json").write_text(json.dumps(protocol, indent=2))
     cached = {}
@@ -204,15 +204,10 @@ def main():
             r = simulate_dynamic(market, signal, p, *PERIODS[stage], cap=selected_cap, costs=costs)
             promotion_results[stage+"_"+name] = r[0]
             promoted = promoted and r[0]["return"] > 0 and r[0]["drawdown"] >= -.05 and r[0]["entries"] >= 5
-    chosen = json.loads((ROOT / "output/optimization/frozen_selection.json").read_text())
-    old = Parameters(**chosen["parameters"])
-    static = simulate(market, research_signals(market, old), old, "2020-01-01", "2026-09-18")
     dynamic = simulate_dynamic(market, signal, p, "2020-01-01", "2026-09-18")
+    stressed = simulate_dynamic(market, signal, p, "2020-01-01", "2026-09-18", costs=STRESS)
     save_result("continuous_dynamic", dynamic)
-    save_result("continuous_previous", static)
-    lower_static = simulate(market, research_signals(market, old), old,
-                            "2020-01-01", "2026-09-18", fraction=.05)
-    save_result("continuous_previous_5pct", lower_static)
+    save_result("continuous_dynamic_stress", stressed)
     equal_params = replace(p, hedge_mode="equal")
     equal_signals, _ = dynamic_signals(market, equal_params)
     equal_result = simulate_dynamic(market, equal_signals, equal_params, "2020-01-01", "2026-09-18")
@@ -223,15 +218,14 @@ def main():
                                                   latest, p, BASE, selected_cap or .2)
     info = {"parameters": asdict(p), "candidate_count": len(candidates), "period_results": evaluation,
             "selected_validation_cap": selected_cap, "supported_cap_after_audit": selected_cap if promoted else 0.,
-            "promotion_results": promotion_results, "continuous_previous": static[0], "continuous_dynamic": dynamic[0],
-            "continuous_previous_5pct": lower_static[0],
+            "promotion_results": promotion_results, "continuous_dynamic": dynamic[0],
+            "continuous_dynamic_stress": stressed[0],
             "continuous_equal_dollar_ablation": equal_result[0],
             "fixed_order_double_cost_returns": {
                 key: value["return"]-(value["commission"]+value["slippage"]+value["borrow"])/100000
                 for key, value in evaluation.items() if key.endswith("_base")},
-            "mean_gross_dollars": {"previous_20pct": float(static[1].gross.mean()),
-                                   "previous_5pct": float(lower_static[1].gross.mean()),
-                                   "dynamic": float(dynamic[1].gross.mean())},
+            "mean_gross_dollars": {"dynamic": float(dynamic[1].gross.mean()),
+                                   "dynamic_stress": float(stressed[1].gross.mean())},
             "latest": {"date": str(signal.index[-1].date()), "EWA_price": latest_market.X,
                        "EWC_price": latest_market.Y, "EWA_dollar_weight": latest.weight_x,
                        "EWC_dollar_weight": latest.weight_y,
@@ -239,7 +233,7 @@ def main():
                        "prediction": latest.prediction, "entry_threshold": threshold,
                        "diagnostic_desired_fraction": fraction, "diagnostic_EWA_qty": tx, "diagnostic_EWC_qty": ty}}
     (OUT / "evaluation.json").write_text(json.dumps(info, indent=2, allow_nan=False))
-    make_charts(market, signal, dynamic, static, evaluation, sizes)
+    make_charts(market, signal, dynamic, stressed, evaluation, sizes)
     lines = ["# 动态信号与对冲比例研究", "",
              "本轮沿用 EWA/EWC 和 10 万美元虚拟账户。所有历史区间均已被观察，本报告是时间顺序研究评估，不能宣称全新样本外检验。", "",
              f"搜索 {len(candidates)} 个线性预测器配置；训练前 12 名进入验证。表中按 20% 最大开仓总金额比较，信号强度及风险预算会降低实际仓位。", "",
@@ -254,12 +248,12 @@ def main():
               "## 连续回测与归因检查", "",
               "2020-01-01 至 2026-09-18，均从 $100,000 开始。", "",
               "| 版本 | 累计收益 | 最大回撤 | 开仓 |", "|---|---:|---:|---:|"]
-    for name, result in (("旧候选 20%", static), ("旧候选 5%", lower_static),
-                         ("动态信号＋动态对冲", dynamic), ("相同参数＋等金额对冲重训", equal_result)):
+    for name, result in (("动态信号＋动态对冲", dynamic), ("本版双倍成本重新决策", stressed),
+                         ("本版等金额对冲消融", equal_result)):
         r = result[0]
         lines.append(f"| {name} | {r['return']:.3%} | {abs(r['drawdown']):.3%} | {r['entries']} |")
-    lines += ["", f"平均实际总敞口：旧 20% ${info['mean_gross_dollars']['previous_20pct']:,.0f}，旧 5% ${info['mean_gross_dollars']['previous_5pct']:,.0f}，动态 ${info['mean_gross_dollars']['dynamic']:,.0f}。降低回撤部分来自更少交易和更低实际仓位，并非纯粹预测能力改善。",
-              "等金额对照只改对冲方式并重新训练对应目标，不按对照收益重新选参数。旧引擎按成交日价格换算股数，新引擎在信号日固定股数，因此旧/新比较包含执行假设变化。",
+    lines += ["", f"默认成本平均实际总敞口 ${info['mean_gross_dollars']['dynamic']:,.0f}。小回撤部分来自少交易和低实际仓位，并非纯粹预测能力的证明。",
+              "等金额消融只改本版对冲方式并重新训练对应目标，不按消融收益重新选参数。",
               "本轮先测试 48 组一般线性预测器，再加入 24 组 Kalman-z 对称回归预测器；这是探索式研究，不能把迭代后的表现当作独立检验。", "",
               "## 资金比例", "",
               f"截至 {info['latest']['date']}：EWA 占双腿总名义金额 {latest.weight_x:.2%}，EWC 占 {latest.weight_y:.2%}；股数比例 |q_EWA|/|q_EWC|={latest.share_ratio_x_per_y:.4f}。一腿买入、另一腿卖空，方向由预测决定。",
