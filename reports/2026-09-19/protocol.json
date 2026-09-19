@@ -1,0 +1,53 @@
+{
+  "pair": [
+    "EWA",
+    "EWC"
+  ],
+  "capital": 100000,
+  "maximum_historical_drawdown": 0.05,
+  "training": [
+    "2016-01-01",
+    "2019-12-31"
+  ],
+  "validation": [
+    "2020-01-01",
+    "2022-12-31"
+  ],
+  "previously_seen_audit": [
+    "2023-01-01",
+    "2025-12-31"
+  ],
+  "fresh_holdout": [
+    "2026-01-01",
+    "2026-09-18"
+  ],
+  "search_candidates": 384,
+  "training_top_k": 12,
+  "fractions": [
+    0,
+    0.05,
+    0.1,
+    0.2,
+    0.35,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "costs": {
+    "commission_per_share": 0.005,
+    "minimum_per_order": 1.0,
+    "slippage_bps": 2.0,
+    "sell_fee_bps": 0.3,
+    "borrow_annual": 0.03
+  },
+  "stress_costs": {
+    "commission_per_share": 0.01,
+    "minimum_per_order": 2,
+    "slippage_bps": 4,
+    "sell_fee_bps": 0.6,
+    "borrow_annual": 0.06
+  },
+  "selection": "train Sharpe top 12 (>=8 trades); rank by minimum train/validation Sharpe; positive return and >=4 validation trades; choose fraction maximizing validation return under base/stress positive returns and <=5% drawdowns in train and validation; cash otherwise",
+  "promotion": "fresh holdout positive base and stressed return, >=5 entries and <=5% drawdown in both; previously seen 2023-2025 must also be positive under base/stress and <=5% drawdown; otherwise no positive allocation supported",
+  "caveat": "2020-2025 baseline already inspected in prior turn; only 2026 is newly reserved."
+}

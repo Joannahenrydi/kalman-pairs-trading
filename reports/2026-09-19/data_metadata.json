@@ -1,0 +1,27 @@
+{
+  "provider": "Yahoo Finance via yfinance (unofficial research interface)",
+  "yfinance_version": "1.7.0",
+  "retrieved_at_utc": "2026-09-19T06:40:28.078243+00:00",
+  "symbols": [
+    "EWA",
+    "EWC"
+  ],
+  "requested_start": "2015-01-01",
+  "requested_end_exclusive": "2026-09-19",
+  "price_field": "Adj Close",
+  "interval": "1d",
+  "source_rows": {
+    "EWA": 2945,
+    "EWC": 2945
+  },
+  "aligned_rows": 2945,
+  "dropped_noncommon_dates": 0,
+  "first_date": "2015-01-02",
+  "last_date": "2026-09-18",
+  "sha256": "32d0968eb50672ebcc05b947cd7b78671c3ff8d4fd0bace07f3d3fe198ca7366",
+  "limitations": [
+    "Adjusted prices are total-return research proxies, not executable quotes.",
+    "Current adjustment factors are not point-in-time corporate-action data.",
+    "Daily-date alignment does not establish simultaneous cross-market closes."
+  ]
+}

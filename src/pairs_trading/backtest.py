@@ -16,8 +16,14 @@ class BacktestResult:
     summary: dict[str, float | int]
 
 
-def run_backtest(prices: pd.DataFrame, x: str, y: str, cfg: StrategyConfig) -> BacktestResult:
+def run_backtest(
+    prices: pd.DataFrame, x: str, y: str, cfg: StrategyConfig,
+    trade_start: str | None = None,
+) -> BacktestResult:
     sig = build_signals(prices, x, y, cfg)
+    start = pd.Timestamp(trade_start) if trade_start else sig.index[cfg.formation_window]
+    if not (sig.index >= start).any():
+        raise ValueError("trade_start is after the available data")
     cash = cfg.initial_capital
     qx = qy = 0
     pending = 0
@@ -44,6 +50,8 @@ def run_backtest(prices: pd.DataFrame, x: str, y: str, cfg: StrategyConfig) -> B
                 cash -= fee
                 position, held, entry_equity = pending, 0, cash
                 trades.append({"date": date, "event": "ENTRY", "side": position, "z": z, "fee": fee})
+            else:
+                qx = qy = 0
             pending = 0
         elif pending and position != 0:
             fee = (abs(qx) * px + abs(qy) * py) * cost_rate
@@ -63,7 +71,7 @@ def run_backtest(prices: pd.DataFrame, x: str, y: str, cfg: StrategyConfig) -> B
             )
             if should_exit:
                 pending = 2  # any nonzero value triggers a close next bar
-        elif np.isfinite(z):
+        elif date >= start and np.isfinite(z):
             if z <= -cfg.entry_z:
                 pending = 1
             elif z >= cfg.entry_z:
@@ -73,6 +81,7 @@ def run_backtest(prices: pd.DataFrame, x: str, y: str, cfg: StrategyConfig) -> B
         prev_px, prev_py = px, py
 
     equity_df = pd.DataFrame(records).set_index("date")
+    equity_df = equity_df.loc[equity_df.index >= start]
     returns = equity_df.equity.pct_change().fillna(0)
     drawdown = equity_df.equity / equity_df.equity.cummax() - 1
     ann_vol = float(returns.std(ddof=1) * np.sqrt(252))
@@ -84,5 +93,9 @@ def run_backtest(prices: pd.DataFrame, x: str, y: str, cfg: StrategyConfig) -> B
         "sharpe_zero_rf": float(returns.mean() * 252 / ann_vol) if ann_vol else 0.0,
         "max_drawdown": float(drawdown.min()),
         "entries": sum(t["event"] == "ENTRY" for t in trades),
+        "exits": sum(t["event"] == "EXIT" for t in trades),
+        "fees_and_slippage": float(sum(t["fee"] for t in trades)),
+        "open_position_at_end": int(position),
+        "evaluation_bars": len(equity_df),
     }
     return BacktestResult(equity_df, pd.DataFrame(trades), sig, summary)

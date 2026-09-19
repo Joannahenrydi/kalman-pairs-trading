@@ -37,6 +37,27 @@ class StrategyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_signals(prices, "PAIR_X", "PAIR_Y", StrategyConfig(30, 20))
 
+    def test_holdout_warms_filter_without_early_trades(self):
+        prices = synthetic_prices(400)
+        start = str(prices.index[250].date())
+        cfg = StrategyConfig()
+        result = run_backtest(prices, "PAIR_X", "PAIR_Y", cfg, trade_start=start)
+        self.assertEqual(result.equity.index[0], prices.index[250])
+        self.assertEqual(result.equity.equity.iloc[0], cfg.initial_capital)
+        self.assertGreater(len(result.trades), 0)
+        self.assertTrue((result.trades.date > prices.index[250]).all())
+        expected = build_signals(prices, "PAIR_X", "PAIR_Y", cfg)
+        np.testing.assert_allclose(result.signals.beta, expected.beta)
+
+    def test_insufficient_capital_does_not_create_orphan_leg(self):
+        prices = synthetic_prices(400)
+        prices["PAIR_Y"] *= 1000
+        cfg = StrategyConfig(initial_capital=1000)
+        result = run_backtest(prices, "PAIR_X", "PAIR_Y", cfg)
+        self.assertTrue((result.equity.qx == 0).all())
+        self.assertTrue((result.equity.qy == 0).all())
+        self.assertTrue((result.equity.equity == 1000).all())
+
     def test_broker_recognizes_pair_and_rejects_orphan(self):
         class Position:
             def __init__(self, symbol, qty):

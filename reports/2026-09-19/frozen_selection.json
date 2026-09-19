@@ -1,0 +1,18 @@
+{
+  "parameters": {
+    "model": "kalman",
+    "window": 120,
+    "process_variance": 1e-07,
+    "entry": 1.5,
+    "exit": 0.5,
+    "stop": 4.0,
+    "holding": 10,
+    "reverting_only": false,
+    "cost_buffer": 1.5
+  },
+  "selected_fraction": 0.0,
+  "selected_initial_gross": 0.0,
+  "diagnostic_fraction": 0.2,
+  "reason": "no positive allocation passed validation and stress constraints",
+  "protocol_sha256": "530dcdb19fb4f13ff0ce43c14c2283d3d826037929c3480d7c47d916859a4900"
+}

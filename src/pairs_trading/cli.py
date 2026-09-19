@@ -55,6 +55,12 @@ def main(argv: list[str] | None = None) -> None:
     backtest.add_argument("--y", required=True)
     backtest.add_argument("--output", default="output/backtest")
     backtest.add_argument("--config")
+    backtest.add_argument("--trade-start", help="first eligible signal date; earlier rows warm up only")
+    download = sub.add_parser("download", help="fetch real adjusted daily prices from Yahoo Finance")
+    download.add_argument("--symbols", nargs="+", required=True)
+    download.add_argument("--start", required=True)
+    download.add_argument("--end", required=True, help="exclusive end date")
+    download.add_argument("--output", default="output/market_data")
     select = sub.add_parser("select")
     select.add_argument("--csv", required=True)
     select.add_argument("--skip-i1-check", action="store_true")
@@ -70,7 +76,12 @@ def main(argv: list[str] | None = None) -> None:
         save_result(run_backtest(synthetic_prices(), "PAIR_X", "PAIR_Y", cfg), args.output)
     elif args.command == "backtest":
         prices = pd.read_csv(args.csv, index_col=0, parse_dates=True)
-        save_result(run_backtest(prices, args.x, args.y, cfg), args.output)
+        save_result(run_backtest(prices, args.x, args.y, cfg, trade_start=args.trade_start), args.output)
+    elif args.command == "download":
+        from .data import download_daily
+
+        prices = download_daily(args.symbols, args.start, args.end, args.output)
+        print(json.dumps({"rows": len(prices), "output": args.output}))
     elif args.command == "select":
         prices = pd.read_csv(args.csv, index_col=0, parse_dates=True)
         print(json.dumps(select_pairs(prices, require_i1=not args.skip_i1_check)))

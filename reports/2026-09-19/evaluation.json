@@ -1,0 +1,158 @@
+{
+  "frozen_selection_sha256": "b9d2442c53d77c7433ddf31437dc5b828dddf083c75825485d8c05ef279834c0",
+  "selection": {
+    "parameters": {
+      "model": "kalman",
+      "window": 120,
+      "process_variance": 1e-07,
+      "entry": 1.5,
+      "exit": 0.5,
+      "stop": 4.0,
+      "holding": 10,
+      "reverting_only": false,
+      "cost_buffer": 1.5
+    },
+    "selected_fraction": 0.0,
+    "selected_initial_gross": 0.0,
+    "diagnostic_fraction": 0.2,
+    "reason": "no positive allocation passed validation and stress constraints",
+    "protocol_sha256": "530dcdb19fb4f13ff0ce43c14c2283d3d826037929c3480d7c47d916859a4900"
+  },
+  "evaluated_fraction": 0.2,
+  "results": {
+    "training_base": {
+      "return": 0.02003873606708151,
+      "final_equity": 102003.87360670815,
+      "drawdown": -0.005682513616104501,
+      "sharpe": 0.7900160895847124,
+      "entries": 35,
+      "commission": 320.9660153061868,
+      "slippage": 281.9248120697023,
+      "borrow": 387.21562985025685,
+      "dividends_net": 217.01999999999998,
+      "max_gross": 21669.980085372925,
+      "max_abs_net": 893.0399742126465
+    },
+    "training_stress": {
+      "return": 0.010085657598068787,
+      "final_equity": 101008.56575980688,
+      "drawdown": -0.006873085092782283,
+      "sharpe": 0.39829599552776823,
+      "entries": 35,
+      "commission": 638.8000734126663,
+      "slippage": 561.0293681411742,
+      "borrow": 770.6848679141737,
+      "dividends_net": 216.72000000000008,
+      "max_gross": 21624.56008529663,
+      "max_abs_net": 893.0399742126465
+    },
+    "validation_base": {
+      "return": -0.00669629943002914,
+      "final_equity": 99330.37005699708,
+      "drawdown": -0.01932870152340349,
+      "sharpe": -0.18922614515244587,
+      "entries": 36,
+      "commission": 298.4224478519346,
+      "slippage": 287.016612672615,
+      "borrow": 386.64498169859775,
+      "dividends_net": -111.00599999999999,
+      "max_gross": 24393.260625839233,
+      "max_abs_net": 1112.3406524658185
+    },
+    "validation_stress": {
+      "return": -0.016300471546247697,
+      "final_equity": 98369.95284537523,
+      "drawdown": -0.021123373878394025,
+      "sharpe": -0.46922717318870866,
+      "entries": 36,
+      "commission": 594.134318502674,
+      "slippage": 571.2248333374023,
+      "borrow": 769.3540817488577,
+      "dividends_net": -110.53399999999998,
+      "max_gross": 24355.800624847412,
+      "max_abs_net": 1104.3706512451154
+    },
+    "previously_seen_audit_base": {
+      "return": -0.009059629015696458,
+      "final_equity": 99094.03709843036,
+      "drawdown": -0.01101808474746635,
+      "sharpe": -0.5154869239054716,
+      "entries": 33,
+      "commission": 237.9664601420021,
+      "slippage": 262.59792059440616,
+      "borrow": 354.38934894295284,
+      "dividends_net": -158.749,
+      "max_gross": 21382.8300075531,
+      "max_abs_net": 1015.64035987854
+    },
+    "previously_seen_audit_stress": {
+      "return": -0.017526700312938348,
+      "final_equity": 98247.32996870617,
+      "drawdown": -0.01792642833538416,
+      "sharpe": -0.9996141208003144,
+      "entries": 33,
+      "commission": 474.05944648448946,
+      "slippage": 522.8825371894835,
+      "borrow": 705.730890225345,
+      "dividends_net": -158.53700000000003,
+      "max_gross": 21212.510007858276,
+      "max_abs_net": 1011.8003559112549
+    },
+    "fresh_holdout_base": {
+      "return": 0.005901658542602162,
+      "final_equity": 100590.16585426021,
+      "drawdown": -0.005191009637448896,
+      "sharpe": 1.2121709537602494,
+      "entries": 6,
+      "commission": 36.29836710617066,
+      "slippage": 48.2317778591156,
+      "borrow": 57.55511657343825,
+      "dividends_net": 0.0,
+      "max_gross": 20843.540061950684,
+      "max_abs_net": 386.92030334472656
+    },
+    "fresh_holdout_stress": {
+      "return": 0.004480805927215004,
+      "final_equity": 100448.0805927215,
+      "drawdown": -0.005451789072149937,
+      "sharpe": 0.9159776932685767,
+      "entries": 6,
+      "commission": 72.59673421234132,
+      "slippage": 96.4635557182312,
+      "borrow": 115.1102331468765,
+      "dividends_net": 0.0,
+      "max_gross": 20843.540061950684,
+      "max_abs_net": 386.92030334472656
+    }
+  },
+  "same_engine_comparison_2020_2025": {
+    "original_thresholds": {
+      "return": -0.04295190461712006,
+      "final_equity": 95704.809538288,
+      "drawdown": -0.051555793916590265,
+      "sharpe": -0.6680949211593475,
+      "entries": 123,
+      "commission": 926.4054303958031,
+      "slippage": 951.3232019481657,
+      "borrow": 1016.1558087687297,
+      "dividends_net": -480.65599999999995,
+      "max_gross": 24425.480625152588,
+      "max_abs_net": 898.0996398925781
+    },
+    "selected_candidate": {
+      "return": -0.015722750364468574,
+      "final_equity": 98427.72496355315,
+      "drawdown": -0.020811641111235457,
+      "sharpe": -0.28554371364680303,
+      "entries": 69,
+      "commission": 534.7916000936985,
+      "slippage": 547.7844312631606,
+      "borrow": 738.5969358530433,
+      "dividends_net": -268.95200000000006,
+      "max_gross": 24393.260625839233,
+      "max_abs_net": 1112.3406524658185
+    }
+  },
+  "passes_promotion": false,
+  "supported_initial_gross_allocation": 0
+}
