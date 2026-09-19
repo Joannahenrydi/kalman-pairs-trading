@@ -4,46 +4,40 @@ A GitHub-ready research and paper-trading project for U.S. equity pairs. The str
 
 > For research purposes only. This project is not financial advice. It sends no orders by default. The Alpaca integration is restricted to `paper=True`; observe paper performance, execution quality, and short-borrow constraints for an extended period before considering any further use.
 
-## Latest: Dynamic Signals and Hedge Allocation
+## Latest: Multi-pair Research and Free API
 
-The dynamic research version updates a linear forecast monthly, evaluates cost-aware entry
-thresholds daily, and computes a constrained minimum-variance dollar hedge. It fixes share
-quantities at the signal close for next-close execution and charges for rebalancing.
+Selected **Alpaca Basic / Paper Only** for the next paper-data integration. It requires
+free account API keys; the authenticated feed has not yet been downloaded or tested.
+[Setup, coverage and limitations](docs/FREE_DATA.md).
 
-**Continuous 2020–September 18, 2026 result, after modeled costs:**
+The current research uses **Yahoo daily data**, not Alpaca. It evaluates six economically
+related ETF pairs (12 symbols), excludes two pairs with unsupported split events, and tests
+six dynamic linear models per remaining pair. Training is 2017–2019, validation 2020–2022,
+and the frozen selection is audited over 2023–September 18, 2026.
 
-| Version | Account return | Maximum drawdown | Entries | Mean gross exposure |
-|---|---:|---:|---:|---:|
-| Dynamic candidate, 20% entry cap | +0.010% | 0.212% | 18 | $510 |
+**No candidate passed the cost-aware acceptance criteria.** The $100,000 account therefore
+remains in cash: 0% return, 0 trades, and $0 supported strategy allocation. This is a rejected
+research result, not evidence of profitable trading or improved performance.
+Each eligible pair would receive a separate $25,000 sleeve, with at most four disjoint pairs.
+Conditional hedge ratios are reported for research, but rejected candidates receive no funds.
 
-The approximately $9.74 profit on $100,000 is economically negligible. The small drawdown
-reflects infrequent trading and low actual exposure. The dynamic candidate has
-**zero 2026 entries**, failed the training/validation acceptance criteria, and retains a
-**zero supported allocation**. All periods have been observed during research; none is
-claimed to be a new untouched test for this version.
+![Current multi-pair performance](reports/2026-09-19/performance.png)
 
-As of September 18, the conditional risk-minimizing gross-dollar split is **41.48% EWA /
-58.52% EWC**, or approximately **1.4844 EWA shares per EWC share**, with opposite signs.
-This is a notional allocation, not a margin requirement. The current signal is below the
-cost threshold, so the diagnostic desired position is zero.
-
-![Dynamic performance](reports/2026-09-19/performance.png)
-
-- [Dynamic report and methodology](reports/2026-09-19/REPORT.md)
-- [Performance images and data index](reports/2026-09-19/README.md)
-- [Download backtest data and images](reports/2026-09-19/backtest_bundle.zip)
-- [Daily dynamic signals and hedge ratios](reports/2026-09-19/dynamic_signals.csv)
+- [Current report](reports/2026-09-19/REPORT.md)
+- [All candidate results](reports/2026-09-19/search.csv)
+- [Conditional hedge ratios and supported capital](reports/2026-09-19/latest_hedges.csv)
+- [Data and figures](reports/2026-09-19/backtest_bundle.zip)
 
 ```bash
 pip install -e '.[data,charts,dev]'
-pairs-trader download --symbols EWA EWC --start 2015-01-01 --end 2026-09-19 --output output/optimization/market_data
-python scripts/evaluate_dynamic.py
+pairs-trader download --symbols EWA EWC XLE VDE XLF VFH XLP VDC XLV VHT XLI VIS --start 2015-01-01 --end 2026-09-19 --output output/multi_pair/market_data
+python scripts/evaluate_multi_pair.py
 ```
 
-This writes figures, signals, fits, trades and a ZIP bundle to `output/dynamic/`.
-The 72-configuration search is exploratory: 48 general ridge candidates were followed by
-24 symmetric Kalman-z reversion candidates. The report documents this iterative research process.
-The updated model remains separate from paper-order submission.
+This writes current research results to `output/multi_pair/results/`.
+Published reports contain only this version; older report files have been replaced.
+The multi-pair model remains separate from paper-order submission. This is daily research,
+not a high-frequency backtest, and minimum-variance hedging does not ensure market-beta neutrality.
 
 ## Paper Alignment and Engineering Improvements
 

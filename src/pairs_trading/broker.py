@@ -33,12 +33,17 @@ class AlpacaPaperBroker:
         self.data = StockHistoricalDataClient(key, secret)
 
     def daily_prices(self, symbols: list[str], lookback_days: int) -> pd.DataFrame:
+        from alpaca.data.enums import Adjustment, DataFeed
         from alpaca.data.requests import StockBarsRequest
         from alpaca.data.timeframe import TimeFrame
 
+        end = pd.Timestamp.now(tz="America/New_York").normalize().to_pydatetime()
         req = StockBarsRequest(
             symbol_or_symbols=symbols,
             timeframe=TimeFrame.Day,
+            feed=DataFeed.IEX,
+            adjustment=Adjustment.ALL,
+            end=end - timedelta(microseconds=1),
             start=datetime.now(timezone.utc) - timedelta(days=lookback_days),
         )
         bars = self.data.get_stock_bars(req).df.reset_index()

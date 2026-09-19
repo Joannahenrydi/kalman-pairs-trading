@@ -3,6 +3,7 @@
 Uses actual close prices and dividend cash flows. Datasets with stock splits
 are rejected: a split-aware execution ledger is not implemented here.
 """
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -43,9 +44,15 @@ class Parameters:
     cost_buffer: float = 1.5
 
 
-def load_market(directory):
+def load_market(directory, symbols=None):
+    numbers = [0, 1]
+    if symbols is not None:
+        if len(symbols) != 2 or symbols[0] == symbols[1]:
+            raise ValueError("exactly two distinct symbols required")
+        metadata = json.loads((Path(directory) / "metadata.json").read_text())
+        numbers = [metadata["symbols"].index(symbol) for symbol in symbols]
     legs = []
-    for number, symbol in enumerate(("X", "Y")):
+    for number, symbol in zip(numbers, ("X", "Y")):
         frame = pd.read_csv(Path(directory) / f"raw_{number}.csv")
         if (frame["Stock Splits"].fillna(0) != 0).any():
             raise ValueError("split events require a split-aware ledger; dataset rejected")

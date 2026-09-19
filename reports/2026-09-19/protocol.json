@@ -1,7 +1,106 @@
 {
-  "candidate_count": 72,
+  "pairs": [
+    [
+      "EWA",
+      "EWC"
+    ],
+    [
+      "XLE",
+      "VDE"
+    ],
+    [
+      "XLF",
+      "VFH"
+    ],
+    [
+      "XLP",
+      "VDC"
+    ],
+    [
+      "XLV",
+      "VHT"
+    ],
+    [
+      "XLI",
+      "VIS"
+    ]
+  ],
+  "parameters": [
+    {
+      "train_window": 504,
+      "horizon": 5,
+      "ridge": 0.1,
+      "confidence": 0.1,
+      "features": "simple",
+      "covariance_span": 60,
+      "minimum_correlation": 0.3,
+      "target_account_volatility": 0.02,
+      "rebalance_band": 0.04,
+      "hedge_mode": "minimum_variance"
+    },
+    {
+      "train_window": 504,
+      "horizon": 5,
+      "ridge": 0.1,
+      "confidence": 0.1,
+      "features": "full",
+      "covariance_span": 60,
+      "minimum_correlation": 0.3,
+      "target_account_volatility": 0.02,
+      "rebalance_band": 0.04,
+      "hedge_mode": "minimum_variance"
+    },
+    {
+      "train_window": 504,
+      "horizon": 5,
+      "ridge": 0.1,
+      "confidence": 0.1,
+      "features": "kalman",
+      "covariance_span": 60,
+      "minimum_correlation": 0.3,
+      "target_account_volatility": 0.02,
+      "rebalance_band": 0.04,
+      "hedge_mode": "minimum_variance"
+    },
+    {
+      "train_window": 504,
+      "horizon": 10,
+      "ridge": 0.1,
+      "confidence": 0.1,
+      "features": "simple",
+      "covariance_span": 60,
+      "minimum_correlation": 0.3,
+      "target_account_volatility": 0.02,
+      "rebalance_band": 0.04,
+      "hedge_mode": "minimum_variance"
+    },
+    {
+      "train_window": 504,
+      "horizon": 10,
+      "ridge": 0.1,
+      "confidence": 0.1,
+      "features": "full",
+      "covariance_span": 60,
+      "minimum_correlation": 0.3,
+      "target_account_volatility": 0.02,
+      "rebalance_band": 0.04,
+      "hedge_mode": "minimum_variance"
+    },
+    {
+      "train_window": 504,
+      "horizon": 10,
+      "ridge": 0.1,
+      "confidence": 0.1,
+      "features": "kalman",
+      "covariance_span": 60,
+      "minimum_correlation": 0.3,
+      "target_account_volatility": 0.02,
+      "rebalance_band": 0.04,
+      "hedge_mode": "minimum_variance"
+    }
+  ],
   "periods": {
-    "training": [
+    "train": [
       "2017-01-01",
       "2019-12-31"
     ],
@@ -11,16 +110,12 @@
     ],
     "audit": [
       "2023-01-01",
-      "2025-12-31"
-    ],
-    "research_2026": [
-      "2026-01-01",
       "2026-09-18"
     ]
   },
-  "capital": 100000,
-  "diagnostic_cap": 0.2,
-  "max_historical_drawdown": 0.05,
+  "capital_usd": 100000,
+  "sleeve_usd": 25000,
+  "max_slots": 4,
   "costs": {
     "commission_per_share": 0.005,
     "minimum_per_order": 1.0,
@@ -35,9 +130,14 @@
     "sell_fee_bps": 0.6,
     "borrow_annual": 0.06
   },
-  "selection": "Top 12 training Sharpe candidates with >=8 entries; select highest min(train,validation) Sharpe among positive train/validation and positive doubled-cost validation, otherwise diagnostic best with zero allocation.",
-  "allocation": "0/5/10/20/35/50/75/100% gross cap; maximize validation return if train,validation and stressed validation positive with <=5% historical drawdown; subsequent audit must also pass.",
-  "warning": "All dates including 2026 were observed before this research; no untouched test claim.",
-  "research_history": "Initial 48 ridge configurations produced weak aggregate improvement and failed validation. Added 24 Kalman-z symmetric reversion configurations. This is iterative exploratory research.",
-  "execution": "Prior-close integer share quantities; next-close fills; monthly ridge trained only on matured next-close-entry horizon labels."
+  "selection": "positive train/validation/stress validation, >=8 entries train and validation, <=5% drawdown each; rank min(train,validation) Sharpe; one model per pair; no shared symbols",
+  "audit_usage": "Never used for selection in this script; retrospective universe/model development is not an untouched holdout.",
+  "provider": "Yahoo Finance via yfinance, not Alpaca",
+  "risk": "Sleeves capped at 100% entry gross, sum <= account capital at entry; market moves can exceed cap. Each sleeve stops after 5% drawdown, next-close exit, not a guaranteed loss bound.",
+  "limitations": [
+    "Surviving ETF universe; not a point-in-time fund universe.",
+    "Minimum variance is not market-beta neutrality.",
+    "Borrow assumed available; no locate rejection or volume participation cap.",
+    "Daily close simulation, not HFT or a running paper account."
+  ]
 }

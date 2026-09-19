@@ -1,10 +1,20 @@
 {
   "provider": "Yahoo Finance via yfinance (unofficial research interface)",
   "yfinance_version": "1.7.0",
-  "retrieved_at_utc": "2026-09-19T06:40:28.078243+00:00",
+  "retrieved_at_utc": "2026-09-19T07:27:41.898933+00:00",
   "symbols": [
     "EWA",
-    "EWC"
+    "EWC",
+    "XLE",
+    "VDE",
+    "XLF",
+    "VFH",
+    "XLP",
+    "VDC",
+    "XLV",
+    "VHT",
+    "XLI",
+    "VIS"
   ],
   "requested_start": "2015-01-01",
   "requested_end_exclusive": "2026-09-19",
@@ -12,13 +22,23 @@
   "interval": "1d",
   "source_rows": {
     "EWA": 2945,
-    "EWC": 2945
+    "EWC": 2945,
+    "XLE": 2945,
+    "VDE": 2945,
+    "XLF": 2945,
+    "VFH": 2945,
+    "XLP": 2945,
+    "VDC": 2945,
+    "XLV": 2945,
+    "VHT": 2945,
+    "XLI": 2945,
+    "VIS": 2945
   },
   "aligned_rows": 2945,
   "dropped_noncommon_dates": 0,
   "first_date": "2015-01-02",
   "last_date": "2026-09-18",
-  "sha256": "32d0968eb50672ebcc05b947cd7b78671c3ff8d4fd0bace07f3d3fe198ca7366",
+  "sha256": "ce27f1ee6600fdb269392ce553cef14f66c05304388de74998f45cabda9db400",
   "limitations": [
     "Adjusted prices are total-return research proxies, not executable quotes.",
     "Current adjustment factors are not point-in-time corporate-action data.",

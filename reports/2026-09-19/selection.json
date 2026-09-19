@@ -1,0 +1,15 @@
+{
+  "selected": [],
+  "excluded": [
+    {
+      "pair": "XLE_VDE",
+      "reason": "split events require a split-aware ledger; dataset rejected"
+    },
+    {
+      "pair": "XLF_VFH",
+      "reason": "split events require a split-aware ledger; dataset rejected"
+    }
+  ],
+  "supported_capital_usd": 0,
+  "cash_reserve_usd": 100000
+}

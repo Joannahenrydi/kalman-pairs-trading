@@ -61,6 +61,12 @@ def main(argv: list[str] | None = None) -> None:
     download.add_argument("--start", required=True)
     download.add_argument("--end", required=True, help="exclusive end date")
     download.add_argument("--output", default="output/market_data")
+    alpaca = sub.add_parser("download-alpaca", help="fetch explicit-feed Alpaca daily research bars")
+    alpaca.add_argument("--symbols", nargs="+", required=True)
+    alpaca.add_argument("--start", required=True)
+    alpaca.add_argument("--end", required=True, help="exclusive end, New York time")
+    alpaca.add_argument("--feed", choices=["iex", "sip"], default="iex")
+    alpaca.add_argument("--output", default="output/alpaca/market_data")
     select = sub.add_parser("select")
     select.add_argument("--csv", required=True)
     select.add_argument("--skip-i1-check", action="store_true")
@@ -82,6 +88,11 @@ def main(argv: list[str] | None = None) -> None:
 
         prices = download_daily(args.symbols, args.start, args.end, args.output)
         print(json.dumps({"rows": len(prices), "output": args.output}))
+    elif args.command == "download-alpaca":
+        from .alpaca_data import download_alpaca
+
+        print(json.dumps(download_alpaca(args.symbols, args.start, args.end,
+                                        args.output, args.feed), indent=2))
     elif args.command == "select":
         prices = pd.read_csv(args.csv, index_col=0, parse_dates=True)
         print(json.dumps(select_pairs(prices, require_i1=not args.skip_i1_check)))
